@@ -42,6 +42,7 @@ public class Commands extends javax.swing.JFrame {
         panelForPainting = new PanelForPainting(this);
         jTabbedPane1.add(panelForPainting);
         setVisible(true);
+        setTexts();
     }
     
     public void initTable(HashMap<Integer, Three<String, Integer, Alice>> collection){
@@ -225,7 +226,7 @@ public class Commands extends javax.swing.JFrame {
         });
         jScrollPane2.setViewportView(table);
 
-        jTabbedPane1.addTab("Таблица", jScrollPane2);
+        jTabbedPane1.addTab("", jScrollPane2);
 
         helloLabel.setText("Добро пожаловать, ");
 
@@ -278,7 +279,7 @@ public class Commands extends javax.swing.JFrame {
 
         messageLabel.setText("Имя:");
 
-        messageCupLabel.setText(" Чашка чая");
+        messageCupLabel.setText("Чашка чая");
 
         messageFullnessLabel.setText("Заполненность:");
 
@@ -692,8 +693,55 @@ public class Commands extends javax.swing.JFrame {
     }
     
     private void languageComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_languageComboBoxActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_languageComboBoxActionPerformed
+        int index = languageComboBox.getSelectedIndex();
+        switch (index){
+            case 0:
+                receiver.setLocale("ru");
+                break;
+            case 1:
+                receiver.setLocale("tr");
+                break;
+            case 2:
+                receiver.setLocale("uk");
+                break;
+            case 3:
+                receiver.setLocale("es", "NI");
+                break;
+        }
+        setTexts();
+    }
+
+    private void setTexts(){
+        languageComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] {
+                receiver.getResource().getString(TextType.RUSSIAN.name()),
+                receiver.getResource().getString(TextType.TURKISH.name()),
+                receiver.getResource().getString(TextType.UKRAINIAN.name()),
+                receiver.getResource().getString(TextType.SPANISH_NI.name()) }));
+        languageComboBox.setSelectedIndex(receiver.getLocale());
+        jTabbedPane1.setTitleAt(0, receiver.getResource().getString(TextType.TABLE.name()));
+        jTabbedPane1.setTitleAt(1,receiver.getResource().getString(TextType.PANEL.name()));
+        helloLabel.setText(receiver.getResource().getString(TextType.WELCOME_LABEL.name()));
+        exitButton.setText(receiver.getResource().getString(TextType.EXIT_BUTTON.name()));
+        changerLabel.setText(receiver.getResource().getString(TextType.CHANGER_LABEL.name()));
+        dateLabel.setText(receiver.getResource().getString(TextType.DATE_LABEL.name()));
+        ownerLabel.setText(receiver.getResource().getString(TextType.OWNER_LABEL.name()));
+        messagePolitenessLabel.setText(receiver.getResource().getString(TextType.POLITENESS_LABEL.name()));
+        messageSizeLabel.setText(receiver.getResource().getString(TextType.SIZE_LABEL.name()));
+        messageLabel.setText(receiver.getResource().getString(TextType.NAME_LABEL.name()));
+        messageCupLabel.setText(receiver.getResource().getString(TextType.CUP_OF_TEA.name()));
+        messageFullnessLabel.setText(receiver.getResource().getString(TextType.FULLNESS_LABEL.name()));
+        messageTeaTypeLabel.setText(receiver.getResource().getString(TextType.TEA_TYPE_LABEL.name()));
+        addButton.setText(receiver.getResource().getString(TextType.ADD_BUTTON.name()));
+        changeButton.setText(receiver.getResource().getString(TextType.CHANGE_BUTTON.name()));
+        removeButton.setText(receiver.getResource().getString(TextType.REMOVE_BUTTON.name()));
+        removeAllButton.setText(receiver.getResource().getString(TextType.REMOVE_ALL_BUTTON.name()));
+        removeGreaterButton.setText(receiver.getResource().getString(TextType.REMOVE_GREATER_BUTTON.name()));
+        importButton.setText(receiver.getResource().getString(TextType.IMPORT_BUTTON.name()));
+        messagePathLabel.setText(receiver.getResource().getString(TextType.PATH_LABEL.name()));
+        collectionLabel.setText(receiver.getResource().getString(TextType.COLLECTION_LABEL.name()));
+        classCollectionLabel.setText(receiver.getResource().getString(TextType.CLASS_COLLECTION_LABEL.name()));
+        countmessageLabel.setText(receiver.getResource().getString(TextType.COUNT_LABEL.name()));
+    }
 
     private void exitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitButtonActionPerformed
         sender.send(MessageType.EXIT, null, token);
@@ -708,7 +756,7 @@ public class Commands extends javax.swing.JFrame {
         if(currentObject != null){
             sender.<Pair<Integer, Alice>>send(MessageType.CHANGE, new Pair<>(currentObject, getAlice()), token);
         } else {
-            JOptionPane.showMessageDialog(this, "Выберите объект","Info",JOptionPane.PLAIN_MESSAGE);
+            JOptionPane.showMessageDialog(this, receiver.getResource().getString(TextType.CHOOSE_OBJECT.name()),"Info",JOptionPane.PLAIN_MESSAGE);
         }
     }//GEN-LAST:event_changeButtonActionPerformed
 
@@ -716,7 +764,7 @@ public class Commands extends javax.swing.JFrame {
         if(currentObject != null){
             sender.<Integer>send(MessageType.REMOVE, currentObject, token);
         } else {
-            JOptionPane.showMessageDialog(this, "Выберите объект","Info",JOptionPane.PLAIN_MESSAGE);
+            JOptionPane.showMessageDialog(this, receiver.getResource().getString(TextType.CHOOSE_OBJECT.name()),"Info",JOptionPane.PLAIN_MESSAGE);
         }
     }//GEN-LAST:event_removeButtonActionPerformed
 
@@ -730,12 +778,12 @@ public class Commands extends javax.swing.JFrame {
 
     private void importButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importButtonActionPerformed
         if(pathTextField.getText()==null||pathTextField.getText().trim().equals("")){
-            JOptionPane.showMessageDialog(this, "Укажите путь","Info",JOptionPane.PLAIN_MESSAGE);
+            JOptionPane.showMessageDialog(this, receiver.getResource().getString(TextType.CHOOSE_PATH.name()),"Info",JOptionPane.PLAIN_MESSAGE);
         } else {
             try{
                 sender.<String>send(MessageType.IMPORT, Reader.justReadFile(pathTextField.getText()), token);
             } catch(FileNotFoundException e) {
-                JOptionPane.showMessageDialog(this, e.getMessage(), "Info", JOptionPane.PLAIN_MESSAGE);
+                JOptionPane.showMessageDialog(this, receiver.getResource().getString(e.getMessage()), "Info", JOptionPane.PLAIN_MESSAGE);
             }
         }
     }//GEN-LAST:event_importButtonActionPerformed

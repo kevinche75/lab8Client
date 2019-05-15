@@ -25,6 +25,7 @@ public class CheckConnection extends javax.swing.JFrame {
         this.receiver = receiver;
         initComponents();
         setVisible(true);
+        setTexts();
     }
     
     public int getPort(){
@@ -112,15 +113,15 @@ public class CheckConnection extends javax.swing.JFrame {
     private void checkButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkButtonActionPerformed
         String innerport = port.getText().trim();
          if (!innerport.matches("[0-9]+")||innerport==null||innerport.equals("")) {
-               JOptionPane.showMessageDialog(this, "Неправильный формат порта","Info",JOptionPane.PLAIN_MESSAGE);
+               JOptionPane.showMessageDialog(this, receiver.getResource().getString(TextType.WRONG_FORMAT_PORT.name()),"Info",JOptionPane.PLAIN_MESSAGE);
         } else {
              portForNextUsage = Integer.parseInt(innerport);
              if(portForNextUsage > 65535) {
-                 JOptionPane.showMessageDialog(this, "Превышен порог","Info",JOptionPane.PLAIN_MESSAGE);
+                 JOptionPane.showMessageDialog(this, receiver.getResource().getString(TextType.MAX_PORT_SIZE.name()),"Info",JOptionPane.PLAIN_MESSAGE);
              }else {
              sender.setAddress(Integer.parseInt(innerport));
              sender.send(MessageType.CONNECT, null, 0);
-             JOptionPane.showMessageDialog(this, "Запрос отправлен","Info",JOptionPane.PLAIN_MESSAGE);
+             JOptionPane.showMessageDialog(this, receiver.getResource().getString(TextType.MESSAGE_SENDED.name()),"Info",JOptionPane.PLAIN_MESSAGE);
              }
          }
          receiver.serverChecked();
@@ -131,8 +132,35 @@ public class CheckConnection extends javax.swing.JFrame {
     }//GEN-LAST:event_exitButtonActionPerformed
 
     private void languageComboBOxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_languageComboBOxActionPerformed
-        // TODO add your handling code here:
+        int index = languageComboBOx.getSelectedIndex();
+        switch (index){
+            case 0:
+                receiver.setLocale("ru");
+                break;
+            case 1:
+                receiver.setLocale("tr");
+                break;
+            case 2:
+                receiver.setLocale("uk");
+                break;
+            case 3:
+                receiver.setLocale("es", "NI");
+                break;
+        }
+        setTexts();
     }//GEN-LAST:event_languageComboBOxActionPerformed
+
+    public void setTexts(){
+        languageComboBOx.setModel(new javax.swing.DefaultComboBoxModel(new String[] {
+                receiver.getResource().getString(TextType.RUSSIAN.name()),
+                receiver.getResource().getString(TextType.TURKISH.name()),
+                receiver.getResource().getString(TextType.UKRAINIAN.name()),
+                receiver.getResource().getString(TextType.SPANISH_NI.name()) }));
+        languageComboBOx.setSelectedIndex(receiver.getLocale());
+        checkButton.setText(receiver.getResource().getString(TextType.CHECK_BUTTON.name()));
+        exitButton.setText(receiver.getResource().getString(TextType.EXIT_BUTTON.name()));
+        portMessageLabel.setText(receiver.getResource().getString(TextType.PORT_LABEL.name()));
+    }
 
 
 //        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">

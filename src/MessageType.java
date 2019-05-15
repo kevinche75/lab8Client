@@ -34,5 +34,5 @@ public enum MessageType {
     REMOVE_ROW,
     REMOVE_ROWS,
     CHANGE_ROW,
-    JSONEXCEPTION,
+    JSON_EXCEPTION,
 }

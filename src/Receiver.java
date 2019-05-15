@@ -5,6 +5,8 @@ import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import javax.swing.JOptionPane;
 
 public class Receiver  {
@@ -20,6 +22,8 @@ public class Receiver  {
     private boolean checkConnectionEnabled = false;
     private boolean loginAndRegisterEnabled = false;
     private boolean commandsEnabled = false;
+    private Locale locale = new Locale("ru");
+    private ResourceBundle resourceBundle = ResourceBundle.getBundle("Resources",locale);
 
     public Receiver() throws IOException {
        channel = DatagramChannel.open();
@@ -27,6 +31,35 @@ public class Receiver  {
        checkConnection = new CheckConnection(sender, this);
        checkConnectionEnabled = true;
        run();
+    }
+
+    public int getLocale(){
+        switch (locale.getLanguage()){
+            case "ru":
+                return 0;
+            case "tr":
+                return 1;
+            case "uk":
+                return 2;
+            case "es":
+                return 3;
+                default:
+                    return 0;
+        }
+    }
+
+    public void setLocale(String locale){
+        this.locale = new Locale(locale);
+        resourceBundle = ResourceBundle.getBundle("Resources", this.locale);
+    }
+
+    public void setLocale(String locale, String country){
+        this.locale = new Locale(locale, country);
+        resourceBundle = ResourceBundle.getBundle("Resources", this.locale);
+    }
+
+    public ResourceBundle getResource(){
+        return resourceBundle;
     }
 
     public String getLogin() {
@@ -86,13 +119,17 @@ public class Receiver  {
     private void sendToken(){
         while(true){
             try {
-            String result = JOptionPane.showInputDialog(loginAndRegister,"Введите токен");
-            int token = Integer.parseInt(result);
-            sender.<String>send(MessageType.TOKEN, login, token);
-            JOptionPane.showMessageDialog(loginAndRegister, "Запрос отправлен","Info",JOptionPane.PLAIN_MESSAGE);
+                if(loginAndRegisterEnabled) {
+                    String result = JOptionPane.showInputDialog(loginAndRegister, resourceBundle.getString(TextType.WRITE_TOKEN.name()));
+                    int token = Integer.parseInt(result);
+                    sender.<String>send(MessageType.TOKEN, login, token);
+                } else return;
+                if(loginAndRegisterEnabled)
+            JOptionPane.showMessageDialog(loginAndRegister, resourceBundle.getString(TextType.MESSAGE_SENDED.name()),"Info",JOptionPane.PLAIN_MESSAGE);
+                else return;
             return;
         } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(loginAndRegister, "Неправильный формат токена","Info",JOptionPane.PLAIN_MESSAGE);
+                JOptionPane.showMessageDialog(loginAndRegister, resourceBundle.getString(TextType.WRONG_FORMAT_TOKEN.name()),"Info",JOptionPane.PLAIN_MESSAGE);
             }
         }
     }
@@ -107,15 +144,15 @@ public class Receiver  {
                         switch (message.getSpecialWord()) {
                             case DISCONNECTION:
                                 disconnection();
-                                JOptionPane.showMessageDialog(checkConnection, "Сервер недоступен","Info",JOptionPane.PLAIN_MESSAGE);
+                                JOptionPane.showMessageDialog(checkConnection, resourceBundle.getString(MessageType.DISCONNECTION.name()),"Info",JOptionPane.PLAIN_MESSAGE);
                                 break;
                             case COMMAND_UNDONE:
                                 if(commandsEnabled) 
-                                    JOptionPane.showMessageDialog(commands, "Комманда не выполнена","Info",JOptionPane.PLAIN_MESSAGE);
+                                    JOptionPane.showMessageDialog(commands, resourceBundle.getString(MessageType.COMMAND_UNDONE.name()),"Info",JOptionPane.PLAIN_MESSAGE);
                                 break;
                             case MAX_NUMBER:
                                 if(loginAndRegisterEnabled)
-                                    JOptionPane.showMessageDialog(loginAndRegister, "Максимальное число пользователей","Info",JOptionPane.PLAIN_MESSAGE);
+                                    JOptionPane.showMessageDialog(loginAndRegister, resourceBundle.getString(MessageType.MAX_NUMBER.name()),"Info",JOptionPane.PLAIN_MESSAGE);
                                 break;
                             case CONNECTION:
                                 serverChecked();
@@ -126,39 +163,41 @@ public class Receiver  {
                                 break;
                             case FALSE_LOGIN:
                                   if(loginAndRegisterEnabled) 
-                                      JOptionPane.showMessageDialog(loginAndRegister, "Неправильный логин или пароль","Info",JOptionPane.PLAIN_MESSAGE);
+                                      JOptionPane.showMessageDialog(loginAndRegister, resourceBundle.getString(MessageType.FALSE_LOGIN.name()),"Info",JOptionPane.PLAIN_MESSAGE);
                                 break;
                             case FALSE_REGISTER_LOGIN:
                                   if(loginAndRegisterEnabled) 
-                                      JOptionPane.showMessageDialog(loginAndRegister, "Неправильный формат логина","Info",JOptionPane.PLAIN_MESSAGE);
+                                      JOptionPane.showMessageDialog(loginAndRegister, resourceBundle.getString(MessageType.FALSE_REGISTER_LOGIN.name()),"Info",JOptionPane.PLAIN_MESSAGE);
                                 break;
                             case ALREADY_EXIST:
                                  if(loginAndRegisterEnabled) 
-                                     JOptionPane.showMessageDialog(loginAndRegister, "Пользователь с таким именем уже существует","Info",JOptionPane.PLAIN_MESSAGE);
+                                     JOptionPane.showMessageDialog(loginAndRegister, resourceBundle.getString(MessageType.ALREADY_EXIST.name()),"Info",JOptionPane.PLAIN_MESSAGE);
                                 break;
                             case TRUE_REGISTER_LOGIN:
-                                  if(loginAndRegisterEnabled)
-                                      JOptionPane.showMessageDialog(loginAndRegister, "Вам на почту отправлен уникальный код","Info",JOptionPane.PLAIN_MESSAGE);
+                                  if(loginAndRegisterEnabled) {
+                                      JOptionPane.showMessageDialog(loginAndRegister, resourceBundle.getString(MessageType.TRUE_REGISTER_LOGIN.name()), "Info", JOptionPane.PLAIN_MESSAGE);
+                                      sendToken();
+                                  }
                                 break;
                             case TOKEN_IS_ACTIVE:
                                 if(loginAndRegisterEnabled) 
-                                      JOptionPane.showMessageDialog(loginAndRegister, "Такой пользователь уже существует, либо токен для этого пользователя ещё активен","Info",JOptionPane.PLAIN_MESSAGE);
+                                      JOptionPane.showMessageDialog(loginAndRegister, resourceBundle.getString(MessageType.TOKEN_IS_ACTIVE.name()),"Info",JOptionPane.PLAIN_MESSAGE);
                                 break;
                             case TRUE_REGISTRATION:
                                 if(loginAndRegisterEnabled) 
-                                      JOptionPane.showMessageDialog(loginAndRegister, "Вы зарегистрированы","Info",JOptionPane.PLAIN_MESSAGE);
+                                      JOptionPane.showMessageDialog(loginAndRegister, resourceBundle.getString(MessageType.TRUE_REGISTRATION.name()),"Info",JOptionPane.PLAIN_MESSAGE);
                                 break;
                             case FALSE_REGISTRATION:
                                if(loginAndRegisterEnabled)
-                                   JOptionPane.showMessageDialog(loginAndRegister, "Неправильно указан уникальный код","Info",JOptionPane.PLAIN_MESSAGE);
+                                   JOptionPane.showMessageDialog(loginAndRegister, resourceBundle.getString(MessageType.FALSE_REGISTRATION.name()),"Info",JOptionPane.PLAIN_MESSAGE);
                                 break;
                             case ERROR:
                                 if(loginAndRegisterEnabled)
-                                   JOptionPane.showMessageDialog(loginAndRegister, "Ошибка получения данных","Info",JOptionPane.PLAIN_MESSAGE);
+                                   JOptionPane.showMessageDialog(loginAndRegister, resourceBundle.getString(MessageType.ERROR.name()),"Info",JOptionPane.PLAIN_MESSAGE);
                                 break;
                             case TOKEN_UNREACHED:
                                 if(loginAndRegisterEnabled){
-                                    JOptionPane.showMessageDialog(loginAndRegister, "Время токена истекло","Info",JOptionPane.PLAIN_MESSAGE);
+                                    JOptionPane.showMessageDialog(loginAndRegister, resourceBundle.getString(MessageType.TOKEN_UNREACHED.name()),"Info",JOptionPane.PLAIN_MESSAGE);
                                     }
                             break;
                             case COLLECTION:
@@ -203,20 +242,20 @@ public class Receiver  {
                                         commands.changeRow(element);}).start();
                                 }
                                 break;
-                            case JSONEXCEPTION:
+                            case JSON_EXCEPTION:
                                 if(commandsEnabled)
-                                    JOptionPane.showMessageDialog(commands, "Ошибка парсинга файла","Info",JOptionPane.PLAIN_MESSAGE);
+                                    JOptionPane.showMessageDialog(commands, resourceBundle.getString(MessageType.JSON_EXCEPTION.name()),"Info",JOptionPane.PLAIN_MESSAGE);
                                 break;
                             default:
 //                                System.out.println(message.getMessage());
                         }
                     } catch (ClassNotFoundException e) {
-                        System.out.println("===\nНеизвестное сообщение от сервера");
+                        JOptionPane.showMessageDialog(loginAndRegister, resourceBundle.getString(TextType.UNKNOWN_MESSAGE.name()),"Info",JOptionPane.PLAIN_MESSAGE);
                     } catch (ClassCastException e){
-                        System.out.println("===\nОшибка получения данных");
+                        JOptionPane.showMessageDialog(loginAndRegister, resourceBundle.getString(MessageType.ERROR.name()),"Info",JOptionPane.PLAIN_MESSAGE);
                     }
                 } catch (IOException e) {
-                    System.out.println("===\nНепредвиденная ошибка приёма пакетов");
+                    JOptionPane.showMessageDialog(loginAndRegister, resourceBundle.getString(MessageType.ERROR.name()),"Info",JOptionPane.PLAIN_MESSAGE);
                 }
             }
 

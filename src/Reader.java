@@ -15,9 +15,9 @@ public class Reader {
     }
 
     static private void checkFile(File file) throws FileNotFoundException {
-        if(!file.exists()) throw new FileNotFoundException("===\nФайл не существует");
-        if(!file.isFile()) throw new FileNotFoundException("===\nЭто не файл");
-        if(!file.canRead()) throw new SecurityException("===\nНевозможно считать файл");
+        if(!file.exists()) throw new FileNotFoundException(TextType.FILE_NOT_EXIST.name());
+        if(!file.isFile()) throw new FileNotFoundException(TextType.IS_NOT_FILE.name());
+        if(!file.canRead()) throw new SecurityException(TextType.CANNOT_READ.name());
     }
 
    static private String readFile(String path) throws FileNotFoundException{
@@ -35,9 +35,8 @@ public class Reader {
             while((stringChar=reader.read())!=-1){
                 line.append((char) stringChar);
             }
-            System.out.println("===\nФайл считан");
         } catch (IOException e){
-            throw new FileNotFoundException("===\nНепредвиденная ошибка чтения файла");
+            throw new FileNotFoundException(TextType.CANNOT_READ.name());
         }
         return line.toString();
     }

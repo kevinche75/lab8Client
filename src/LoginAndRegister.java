@@ -21,6 +21,7 @@ public class LoginAndRegister extends javax.swing.JFrame {
         this.sender = sender;
         initComponents();
         setVisible(true);
+        setTexts();
     }
 
     public String getLogin() {
@@ -143,45 +144,71 @@ public class LoginAndRegister extends javax.swing.JFrame {
 
     private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginButtonActionPerformed
         if(loginText.getText() == null ||loginText.getText().trim().equals("")){
-            JOptionPane.showMessageDialog(this, "Введите логин","Info",JOptionPane.PLAIN_MESSAGE);
+            JOptionPane.showMessageDialog(this, receiver.getResource().getString(TextType.WRITE_LOGIN.name()),"Info",JOptionPane.PLAIN_MESSAGE);
             return;
         }
         if(passwordText.getText() == null ||passwordText.getText().trim().equals("")){
-            JOptionPane.showMessageDialog(this, "Введите пароль","Info",JOptionPane.PLAIN_MESSAGE);
+            JOptionPane.showMessageDialog(this, receiver.getResource().getString(TextType.WRITE_PASSWORD.name()),"Info",JOptionPane.PLAIN_MESSAGE);
             return;
         }
         login = loginText.getText().trim();
         Pair<String, String> loginPassword = new Pair<>(loginText.getText().trim(), passwordText.getText());
         sender.<Pair<String, String>>send(MessageType.LOGIN, loginPassword, 0);
-        JOptionPane.showMessageDialog(this, "Запрос отправлен","Info",JOptionPane.PLAIN_MESSAGE);
+        JOptionPane.showMessageDialog(this, receiver.getResource().getString(TextType.MESSAGE_SENDED.name()),"Info",JOptionPane.PLAIN_MESSAGE);
         receiver.loginChecked();
     }//GEN-LAST:event_loginButtonActionPerformed
 
     private void languageComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_languageComboBoxActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_languageComboBoxActionPerformed
+        int index = languageComboBox.getSelectedIndex();
+        switch (index){
+            case 0:
+                receiver.setLocale("ru");
+                break;
+            case 1:
+                receiver.setLocale("tr");
+                break;
+            case 2:
+                receiver.setLocale("uk");
+                break;
+            case 3:
+                receiver.setLocale("es", "NI");
+                break;
+        }
+        setTexts();
+    }
+
+    public void setTexts(){
+        languageComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] {
+                receiver.getResource().getString(TextType.RUSSIAN.name()),
+                receiver.getResource().getString(TextType.TURKISH.name()),
+                receiver.getResource().getString(TextType.UKRAINIAN.name()),
+                receiver.getResource().getString(TextType.SPANISH_NI.name()) }));
+        languageComboBox.setSelectedIndex(receiver.getLocale());
+        backButton.setText(receiver.getResource().getString(TextType.BACK_BUTTON.name()));
+        loginButton.setText(receiver.getResource().getString(TextType.LOGIN_BUTTON.name()));
+        loginLabel.setText(receiver.getResource().getString(TextType.LOGIN_LABEL.name()));
+        passwordLabel.setText(receiver.getResource().getString(TextType.PASSWORD_LABEL.name()));
+        registerButton.setText(receiver.getResource().getString(TextType.REGISTER_BUTTON.name()));
+    }
 
     private void registerButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        //GEN-FIRST:event_registerButtonActionPerformed
         if(loginText.getText() == null ||loginText.getText().trim().equals("")){
-            JOptionPane.showMessageDialog(this, "Введите логин","Info",JOptionPane.PLAIN_MESSAGE);
+            JOptionPane.showMessageDialog(this, receiver.getResource().getString(TextType.WRITE_LOGIN.name()),"Info",JOptionPane.PLAIN_MESSAGE);
             return;
         }
         if(passwordText.getText() == null ||passwordText.getText().trim().equals("")){
-            JOptionPane.showMessageDialog(this, "Введите пароль","Info",JOptionPane.PLAIN_MESSAGE);
+            JOptionPane.showMessageDialog(this, receiver.getResource().getString(TextType.WRITE_PASSWORD.name()),"Info",JOptionPane.PLAIN_MESSAGE);
             return;
         }
         Pair<String,String> registerPassword = new Pair<>(loginText.getText().trim(), passwordText.getText());
         sender.<Pair<String, String>>send(MessageType.REGISTER, registerPassword, 0);
-        JOptionPane.showMessageDialog(this, "Запрос отправлен","Info",JOptionPane.PLAIN_MESSAGE);
-    }//GEN-LAST:event_registerButtonActionPerformed
+        JOptionPane.showMessageDialog(this, receiver.getResource().getString(TextType.MESSAGE_SENDED.name()),"Info",JOptionPane.PLAIN_MESSAGE);
+    }
 
-    private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backButtonActionPerformed
+    private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {
         receiver.loginBack();
-    }//GEN-LAST:event_backButtonActionPerformed
+    }
 
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton backButton;
     private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JComboBox languageComboBox;
@@ -192,5 +219,4 @@ public class LoginAndRegister extends javax.swing.JFrame {
     private javax.swing.JLabel passwordLabel;
     private javax.swing.JPasswordField passwordText;
     private javax.swing.JButton registerButton;
-    // End of variables declaration//GEN-END:variables
 }
