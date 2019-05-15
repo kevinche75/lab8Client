@@ -16,7 +16,6 @@ public class Receiver  {
     private LoginAndRegister loginAndRegister;
     private Commands commands;
     private Sender sender;
-    private int port;
     private int token;
     private String login;
     private boolean checkConnectionEnabled = false;
@@ -30,7 +29,15 @@ public class Receiver  {
        sender = new Sender(channel);
        checkConnection = new CheckConnection(sender, this);
        checkConnectionEnabled = true;
+       shootDown();
        run();
+    }
+
+    private void shootDown() {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (commandsEnabled) sender.send(MessageType.EXIT, null,token);
+            System.out.println("Goodbye");
+        }));
     }
 
     public int getLocale(){
@@ -98,7 +105,6 @@ public class Receiver  {
     }
     
     public void serverChecked(){
-        port = checkConnection.getPort();
         checkConnection.dispose();
         loginAndRegister = new LoginAndRegister(sender, this);
     }
@@ -150,28 +156,25 @@ public class Receiver  {
                                 if(commandsEnabled) 
                                     JOptionPane.showMessageDialog(commands, resourceBundle.getString(MessageType.COMMAND_UNDONE.name()),"Info",JOptionPane.PLAIN_MESSAGE);
                                 break;
-                            case MAX_NUMBER:
-                                if(loginAndRegisterEnabled)
-                                    JOptionPane.showMessageDialog(loginAndRegister, resourceBundle.getString(MessageType.MAX_NUMBER.name()),"Info",JOptionPane.PLAIN_MESSAGE);
-                                break;
                             case CONNECTION:
                                 serverChecked();
                                 break;
                             case TRUE_LOGIN:
                                 if(loginAndRegisterEnabled)
+                                    token = (Integer) message.getArgument();
                                     loginChecked();
                                 break;
+                            case MAX_NUMBER:
                             case FALSE_LOGIN:
-                                  if(loginAndRegisterEnabled) 
-                                      JOptionPane.showMessageDialog(loginAndRegister, resourceBundle.getString(MessageType.FALSE_LOGIN.name()),"Info",JOptionPane.PLAIN_MESSAGE);
-                                break;
                             case FALSE_REGISTER_LOGIN:
-                                  if(loginAndRegisterEnabled) 
-                                      JOptionPane.showMessageDialog(loginAndRegister, resourceBundle.getString(MessageType.FALSE_REGISTER_LOGIN.name()),"Info",JOptionPane.PLAIN_MESSAGE);
-                                break;
                             case ALREADY_EXIST:
-                                 if(loginAndRegisterEnabled) 
-                                     JOptionPane.showMessageDialog(loginAndRegister, resourceBundle.getString(MessageType.ALREADY_EXIST.name()),"Info",JOptionPane.PLAIN_MESSAGE);
+                            case TOKEN_IS_ACTIVE:
+                            case TRUE_REGISTRATION:
+                            case FALSE_REGISTRATION:
+                            case TOKEN_UNREACHED:
+                                if(loginAndRegisterEnabled){
+                                    JOptionPane.showMessageDialog(loginAndRegister, resourceBundle.getString(message.getSpecialWord().name()),"Info",JOptionPane.PLAIN_MESSAGE);
+                                }
                                 break;
                             case TRUE_REGISTER_LOGIN:
                                   if(loginAndRegisterEnabled) {
@@ -179,27 +182,10 @@ public class Receiver  {
                                       sendToken();
                                   }
                                 break;
-                            case TOKEN_IS_ACTIVE:
-                                if(loginAndRegisterEnabled) 
-                                      JOptionPane.showMessageDialog(loginAndRegister, resourceBundle.getString(MessageType.TOKEN_IS_ACTIVE.name()),"Info",JOptionPane.PLAIN_MESSAGE);
-                                break;
-                            case TRUE_REGISTRATION:
-                                if(loginAndRegisterEnabled) 
-                                      JOptionPane.showMessageDialog(loginAndRegister, resourceBundle.getString(MessageType.TRUE_REGISTRATION.name()),"Info",JOptionPane.PLAIN_MESSAGE);
-                                break;
-                            case FALSE_REGISTRATION:
-                               if(loginAndRegisterEnabled)
-                                   JOptionPane.showMessageDialog(loginAndRegister, resourceBundle.getString(MessageType.FALSE_REGISTRATION.name()),"Info",JOptionPane.PLAIN_MESSAGE);
-                                break;
                             case ERROR:
-                                if(loginAndRegisterEnabled)
-                                   JOptionPane.showMessageDialog(loginAndRegister, resourceBundle.getString(MessageType.ERROR.name()),"Info",JOptionPane.PLAIN_MESSAGE);
+                                if(loginAndRegisterEnabled||checkConnectionEnabled)
+                                   JOptionPane.showMessageDialog(null, resourceBundle.getString(MessageType.ERROR.name()),"Info",JOptionPane.PLAIN_MESSAGE);
                                 break;
-                            case TOKEN_UNREACHED:
-                                if(loginAndRegisterEnabled){
-                                    JOptionPane.showMessageDialog(loginAndRegister, resourceBundle.getString(MessageType.TOKEN_UNREACHED.name()),"Info",JOptionPane.PLAIN_MESSAGE);
-                                    }
-                            break;
                             case COLLECTION:
                                 if(commandsEnabled){
                                     HashMap<Integer, Three<String, Integer, Alice>> collection = (HashMap<Integer, Three<String, Integer, Alice>>) message.getArgument();
